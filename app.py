@@ -85,7 +85,12 @@ def cmd_board(args):
         print('Threads on /',args[0],'/',sep='')
         for i in threads:
             try:
-                print(i['no'],' - ',i['com'][:50])
+                s = ''
+                try:
+                    s=' -  ['+i['ext']+']'
+                except:
+                    s=' -  [nofile]'
+                print(i['no'],' - ',i['com'][:50],s)
             except:
                 print(i['no'],' -  No comment!')
         print('Page',page,'/',len(catalog))
