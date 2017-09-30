@@ -6,7 +6,7 @@
  * Created by Insertish
  */
 '''
-import sys, html, urllib.request
+import sys, html, urllib.request, io, base64, os
 print('py4ch\n4chan CLI\nWritten for Python 3.6.2\nCreated by Insertish\n\n')
 try:
     import requests
@@ -27,10 +27,35 @@ def download(post, board):
     try:
         try:
             print('Downloading',str(post['tim'])+post['ext'])
-            urllib.request.urlretrieve('https://i.4cdn.org/'+board+'/'+str(post['tim'])+post['ext'],str(post['tim'])+post['ext'])
+            d = ''
+            if (os.path.isdir('./dl')): d='./dl/'
+            urllib.request.urlretrieve('https://i.4cdn.org/'+board+'/'+str(post['tim'])+post['ext'],d+str(post['tim'])+post['ext'])
             print('Downloaded!')
         except:
             print('Failed to download',str(post['tim'])+post['ext'])
+    except:
+        print('No file was attached!')
+def view_image(post, board):
+    try:
+        try:
+            image_url = 'https://i.4cdn.org/'+board+'/'+str(post['tim'])+post['ext']
+            import tkinter as tk
+            root = tk.Tk()
+            root.title(image_url)
+            w = post['w']+20
+            h = post['h']+20
+            x = 20
+            y = 20
+            root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+            image_byt = urllib.request.urlopen(image_url).read()
+            image_b64 = base64.encodestring(image_byt)
+            photo = tk.PhotoImage(data=image_b64)
+            cv = tk.Canvas(bg='white')
+            cv.pack(side='top', fill='both', expand='yes')
+            cv.create_image(10, 10, image=photo, anchor='nw')
+            root.mainloop()
+        except:
+            print('Failed to render',str(post['tim'])+post['ext'])
     except:
         print('No file was attached!')
 def cmd_help():
@@ -113,12 +138,18 @@ def cmd_viewer(args):
         for i in thread:
             print_post(i, args[0])
             print('Reply',y,'/',len(thread));y+=1
-            q=input('Press any key to view next.. [q to exit] [s to save file]\n')
-            if (q=='q'): break
-            elif (q=='s'):
-                download(i, args[0])
-                q=input('Finished downloading, press any key to view next.. [q to exit]\n')
-                if (q=='q'): break
+            s=0
+            while s==0:
+                q=input('Press any key to view next.. [q to exit] [s to save file] [v to view file]\n').lower()
+                if (q=='q'): s = 2
+                elif (q=='s'):
+                    download(i, args[0])
+                    print('Finished downloading!')
+                elif (q=='v'):
+                    view_image(i, args[0])
+                    print('Finished viewing image!')
+                else: s = 1
+            if (s==2): break
     else:
         print('Failed to get any threads! [',r.status_code,']',sep='')
 def process(args):
