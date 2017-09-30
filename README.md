@@ -3,3 +3,4 @@
 
 ## Demo
 ![Demo](https://i.imgur.com/aXPcgmd.gif)
+![Image Preview Demo](https://i.imgur.com/1Rz27XM.gif)
